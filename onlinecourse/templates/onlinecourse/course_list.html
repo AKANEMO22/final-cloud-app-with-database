@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Popular Courses - OnlineCourse</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-light bg-light mb-4 shadow-sm">
+        <div class="container">
+            <a class="navbar-brand font-weight-bold text-primary" href="#">OnlineCourse</a>
+        </div>
+    </nav>
+    <div class="container my-4">
+        <h2 class="mb-4">Popular Courses</h2>
+        <div class="row">
+            {% for course in course_list %}
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h4 class="card-title text-primary">{{ course.name }}</h4>
+                        <p class="card-text text-muted">{{ course.description }}</p>
+                        <a href="{% url 'onlinecourse:course_details' course.id %}" class="btn btn-outline-primary">View Course Details</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12"><div class="alert alert-info">No courses available.</div></div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exam Results - {{ course.name }}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        .correct-answer { color: #28a745; font-weight: bold; }
+        .wrong-answer { color: #dc3545; }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand font-weight-bold" href="{% url 'onlinecourse:popular_course_list' %}">OnlineCourse</a>
+            <span class="navbar-text text-light">Exam Result Review</span>
+        </div>
+    </nav>
+
+    <div class="container my-4">
+        <!-- Result Banner -->
+        {% if grade >= 70 %}
+        <div class="alert alert-success p-4 shadow-sm rounded">
+            <h2 class="alert-heading font-weight-bold">Congratulations, {{ user.username|default:"Student" }}!</h2>
+            <p class="lead mb-0">You have successfully passed the exam with a score of <strong>{{ grade }}% / 100%</strong>.</p>
+            <hr>
+            <p class="mb-0">You have completed all assessment requirements for <strong>{{ course.name }}</strong>.</p>
+        </div>
+        {% else %}
+        <div class="alert alert-danger p-4 shadow-sm rounded">
+            <h2 class="alert-heading font-weight-bold">Exam Results</h2>
+            <p class="lead mb-0">Your score: <strong>{{ grade }}% / 100%</strong>. You need at least 70% to pass.</p>
+        </div>
+        {% endif %}
+
+        <!-- Questions & Results Breakdown -->
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0 font-weight-bold">Exam Submission Review</h4>
+            </div>
+            <div class="card-body bg-white">
+                {% for question in questions %}
+                <div class="card mb-3 border-light shadow-sm">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <span class="font-weight-bold">Question {{ forloop.counter }}: {{ question.question_text }}</span>
+                        <span class="badge badge-primary badge-pill">{{ question.grade }} pts</span>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            {% for choice in question.choice_set.all %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    {% if choice.id in selected_ids %}
+                                        <input type="checkbox" checked disabled>
+                                    {% else %}
+                                        <input type="checkbox" disabled>
+                                    {% endif %}
+                                    <span class="ml-2 {% if choice.is_correct %}correct-answer{% endif %}">
+                                        {{ choice.choice_text }}
+                                    </span>
+                                </div>
+                                <div>
+                                    {% if choice.is_correct %}
+                                        <span class="badge badge-success">Correct Answer</span>
+                                    {% endif %}
+                                    {% if choice.id in selected_ids and choice.is_correct %}
+                                        <span class="badge badge-primary ml-1">Your Selection: Correct</span>
+                                    {% elif choice.id in selected_ids and not choice.is_correct %}
+                                        <span class="badge badge-danger ml-1">Your Selection: Incorrect</span>
+                                    {% endif %}
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="mt-4 text-center">
+            <a href="{% url 'onlinecourse:course_details' course.id %}" class="btn btn-outline-primary mr-2">Back to Course</a>
+            <a href="{% url 'onlinecourse:popular_course_list' %}" class="btn btn-primary">Browse Other Courses</a>
+        </div>
+    </div>
+</body>
+</html>
