@@ -71,18 +71,25 @@ def show_exam_result(request, course_id, submission_id):
     if not questions.exists():
         questions = Question.objects.filter(lesson__course=course)
 
-    total_possible = sum([q.grade for q in questions]) or 100
-    earned_score = 0
+    # Calculate total possible points and pass possible to context
+    possible = sum([q.grade for q in questions])
+    if possible == 0:
+        possible = 100
 
+    earned_score = 0
     for question in questions:
         if question.is_get_score(selected_choice_ids):
             earned_score += question.grade
 
-    grade = int((earned_score / total_possible) * 100) if total_possible > 0 else 0
+    grade = int((earned_score / possible) * 100) if possible > 0 else 0
 
     context['course'] = course
     context['selected_ids'] = selected_choice_ids
     context['grade'] = grade
+    context['score'] = earned_score
+    context['earned_score'] = earned_score
+    context['possible'] = possible
+    context['total_possible'] = possible
     context['submission'] = submission
     context['questions'] = questions
 
